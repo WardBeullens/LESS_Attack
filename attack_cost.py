@@ -38,7 +38,7 @@ def Hamming_Ball(n,q,w):
         S += binomial(n,i) * (q-1)**i
     return int(S)
 
-def attack_bit_cost_fixed_W(n,k,W,q,verbose=True,LEP=True):
+def attack_cost_fixed_W(n,k,W,q,verbose=True,LEP=True):
     if LEP == False: # number of vectors of weight W
         search_space_size = Hamming_Ball(n,q,W)//int(q**(n-k))//(q-1)
     else: # number of 2*spaces with support of size W 
@@ -74,17 +74,17 @@ def attack_bit_cost_fixed_W(n,k,W,q,verbose=True,LEP=True):
     attack_cost = ISD_cost + Normal_form_cost
     
     if verbose:
-        print("new attack bit cost: %f, list size: %d (2^%f), (w = %d)" % (log(attack_cost,2), list_size ,log(list_size,2),W))
+        print("new attack cost (log_2 of #row ops): %f, list size: %d (2^%f), (w = %d)" % (log(attack_cost,2), list_size ,log(list_size,2),W))
     
     return log(attack_cost,2)
 
 
-def attack_bit_cost(n,k,q,verbose = True, LEP = True):
+def attack_cost(n,k,q,verbose = True, LEP = True):
     best_cost = 10000000
     best_W = None
     
     for W in range(1,n-k+1):
-        c = attack_bit_cost_fixed_W(n,k,W,q,False,LEP)
+        c = attack_cost_fixed_W(n,k,W,q,False,LEP)
         if c is not None and c < best_cost:
             best_cost = c
             best_W = W;
@@ -93,7 +93,7 @@ def attack_bit_cost(n,k,q,verbose = True, LEP = True):
         return None
 
     if verbose:
-        attack_bit_cost_fixed_W(n,k,best_W,q,True,LEP)
+        attack_cost_fixed_W(n,k,best_W,q,True,LEP)
     return best_cost
     
 
@@ -115,22 +115,22 @@ def LEON(n,k,q):
     w , N = minimal_w(n,k,q)
     S = ceil(2*(0.57+log(N)))*ISD_COST(n,k,w,q)
     
-    print("Leon attack bit cost:%f, w: %d, N: %d " % (log(S,2),w,N))
+    print("Leon attack cost (log_2 of #row ops):%f, w: %d, N: %d " % (log(S,2),w,N))
     return log(S,2);
 
 
 print("proposed LESS-I parameters: ")
-attack_bit_cost(250,125,53)
+attack_cost(250,125,53)
 LEON(250,125,53)
 
 print("\noriginal LESS-II parameters: ")
-attack_bit_cost(106,45,7)
+attack_cost(106,45,7)
 LEON(106,45,7)
 
 print("\nproposed LESS-III parameters (larger field size): ")
-attack_bit_cost(280,117,149,LEP=False)
+attack_cost(280,117,149,LEP=False)
 LEON(280,117,149)
 
 print("\nproposed LESS-III parameters (fixed field size): ")
-attack_bit_cost(305,127,31,LEP=False)
+attack_cost(305,127,31,LEP=False)
 LEON(305,127,31)
